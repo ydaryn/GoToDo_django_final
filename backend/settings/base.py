@@ -12,7 +12,7 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 ROOT_URLCONF       = "settings.urls"
 WSGI_APPLICATION   = "settings.wsgi.application"
 ASGI_APPLICATION   = "settings.asgi.application"
-AUTH_USER_MODEL    = "users.CustomUser"
+#AUTH_USER_MODEL    = "users.CustomUser"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DJANGO_AND_THIRD_PARTY_APPS = [
@@ -35,7 +35,7 @@ PROJECT_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
-AUTH_USER_MODEL = 'users.CustomUser'
+#AUTH_USER_MODEL = 'users.CustomUser'
 
 
 MIDDLEWARE = [
@@ -63,70 +63,6 @@ SIMPLE_JWT = {
 }
 
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "simple": {
-            "format": "[{levelname}] {message}",
-            "style": "{",
-        },
-        "verbose": {
-            "format": "[{asctime}] {levelname} "
-            "{name} {module}.{funcName}: {lineno} - {message}",
-            "style": "{",
-        },
-    },
-    "filters": {
-        "require_debug_true": {
-            "()": "django.utils.log.RequireDebugTrue",
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "DEBUG",
-            "formatter": "simple",
-        },
-        "file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "level": "WARNING",
-            "filename": os.path.join(LOGS_DIR, "app.log"),
-            "maxBytes": 5 * 1024 * 1024,  # 10 MB
-            "backupCount": 3,
-            "formatter": "verbose",
-            "encoding": "utf-8",
-        },
-        "debug_only": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "level": "DEBUG",
-            "filename": os.path.join(LOGS_DIR, "debug_requests.log"),
-            "maxBytes": 5 * 1024 * 1024,  # 10 MB
-            "backupCount": 3,
-            "formatter": "verbose",
-            "filters": ["require_debug_true"],
-            "encoding": "utf-8",
-        },
-    },
-    "loggers": {
-        "apps.users": {
-            "handlers": ["console", "file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-        "apps.blog": {
-            "handlers": ["console", "file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-        "django.request": {
-            "handlers": ["file", "debug_only"],
-            "level": "WARNING",
-            "propagate": False,
-        },
-    },
-   
-}
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -194,17 +130,7 @@ PARLER_LANGUAGES = {
     },
 }
 
-"""
-channel layers
-"""
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(REDIS_HOST, REDIS_PORT)],
-        },
-    },
-}
+
 
 
 
@@ -229,17 +155,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-_celery_redis_url = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"  # noqa: F405
-CELERY_BROKER_URL = _celery_redis_url
-CELERY_RESULT_BACKEND = _celery_redis_url
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
-
-SPECTACULAR_SETTINGS = {
-    "TITLE": "Blog API",
-    "DESCRIPTION": "Blog API HW2 — Multilingual blog with async stats",
-    "VERSION": "2.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-}

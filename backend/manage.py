@@ -10,7 +10,7 @@ from settings.conf import GOTODO_ENV_ID, ENV_ID_POSSIBLE_OPTIONS
 def main():
     """Run administrative tasks."""
     assert GOTODO_ENV_ID in ENV_ID_POSSIBLE_OPTIONS, (
-        f"Set correct BLOG_ENV_ID env var. Possible options: {ENV_ID_POSSIBLE_OPTIONS}"
+        f"Set correct GOTODO_ENV_ID env var. Possible options: {ENV_ID_POSSIBLE_OPTIONS}"
     )
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"settings.env.{GOTODO_ENV_ID}")
     try:
