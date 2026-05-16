@@ -6,6 +6,9 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.utils.translation import gettext_lazy as _
+
+message = _("This is a message in the accounts/views app.")
 
 from .serializers import (
     CustomTokenObtainPairSerializer,

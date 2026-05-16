@@ -1,3 +1,4 @@
+from importlib import simple
 import os
 from datetime import timedelta
 
@@ -112,13 +113,23 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 """
-Languages
+L10N and I18N
 """
-SUPPORTED_LANGUAGES = ["en", "ru", "kk"]
+LANGUAGE_CODE = "en-us"
+
+TIME_ZONE = "Asia/Almaty"
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
 LANGUAGES = [
     ("en", "English"),
-    ("ru", "Русский"),
-    ("kk", "Қазақша"),
+    ("ru", "Russian"),
+    ("kk", "Kazakh"),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / "locale",
 ]
 
 """
@@ -215,5 +226,46 @@ CELERY_BEAT_SCHEDULE = {
     "check-overdue-tasks-every-minute": {
         "task" : "apps.agile.tasks.check_overdue_tasks",
         "schedule": 60.0,  # every minute
+    },
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "logs/django.log",
+            "formatter": "verbose",
+        }
+    },
+
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "apps": {
+            "handlers": ["console", "file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
     },
 }
