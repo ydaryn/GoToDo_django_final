@@ -1,5 +1,6 @@
+# apps/agile/apps.py
 from django.apps import AppConfig
 
-
 class AgileConfig(AppConfig):
-    name = 'agile'
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'apps.agile'  
