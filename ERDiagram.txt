@@ -1,5 +1,5 @@
 // Task Manager - Entity Relationship Diagram
-// Paste this at dbdiagram.io
+// dbdiagram.io
 
 Table users {
   id          integer   [pk, increment]
