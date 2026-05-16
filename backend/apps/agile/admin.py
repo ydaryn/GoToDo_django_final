@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from apps.agile.models import Epic, Sprint, Task, SubTask
+from apps.agile.models import Epic, Sprint, SubTask, Task
 from apps.projects.models import Tag
 
 

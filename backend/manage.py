@@ -4,14 +4,14 @@
 import os
 import sys
 
-from settings.conf import GOTODO_ENV_ID, ENV_ID_POSSIBLE_OPTIONS
+from settings.conf import ENV_ID_POSSIBLE_OPTIONS, GOTODO_ENV_ID
 
 
 def main():
     """Run administrative tasks."""
-    assert GOTODO_ENV_ID in ENV_ID_POSSIBLE_OPTIONS, (
-        f"Set correct GOTODO_ENV_ID env var. Possible options: {ENV_ID_POSSIBLE_OPTIONS}"
-    )
+    assert (
+        GOTODO_ENV_ID in ENV_ID_POSSIBLE_OPTIONS
+    ), f"Set correct GOTODO_ENV_ID env var. Possible options: {ENV_ID_POSSIBLE_OPTIONS}"
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"settings.env.{GOTODO_ENV_ID}")
     try:
         from django.core.management import execute_from_command_line
