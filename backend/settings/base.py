@@ -27,7 +27,8 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     "parler",
     "adrf",
     "drf_spectacular",
-    "channels"
+    "channels",
+    "django_filters",
 ]
 
 PROJECT_APPS = [
@@ -72,6 +73,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.CursorPagination",
     "PAGE_SIZE": 100,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ),
 }
 
 
@@ -158,22 +164,35 @@ CELERY_TIMEZONE = TIME_ZONE
 
 # API Documentation (Swagger / Spectacular)
 
+# API Documentation (Swagger / Redoc / Spectacular)
+
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'GoToDo API',
-    'DESCRIPTION': 'Документация бэкенда для таск-менеджера GoToDo (KBTU Final Project)',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'COMPONENT_SPLIT_REQUEST': True,
-    # Настройка, чтобы прямо в Swagger можно было нажать кнопку Authorize и вставить JWT-токен
-    'SECURITY': [{'BearerAuth': []}],
-    'APPEND_COMPONENTS': {
-        'securitySchemes': {
-            'BearerAuth': {
-                'type': 'apiKey',
-                'in': 'header',
-                'name': 'Authorization',
-                'description': 'Введите токен в формате: Bearer <ваш_access_token>'
+    "TITLE": "GoToDo API",
+    "DESCRIPTION": (
+        "GoToDo API is a Django REST Framework backend for project management, "
+        "sprint planning, epic tracking, task management and subtask workflow. "
+        "The system includes JWT authentication, custom permissions, filtering, "
+        "searching, ordering, optimized querysets, Swagger and Redoc documentation."
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SWAGGER_UI_SETTINGS": {
+        "persistAuthorization": True,
+    },
+    "SECURITY": [
+        {
+            "BearerAuth": [],
+        }
+    ],
+    "APPEND_COMPONENTS": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Enter JWT access token in format: Bearer <access_token>",
             }
         }
-    }
+    },
 }
