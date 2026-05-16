@@ -1,0 +1,36 @@
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | migrations
+  | __pycache__
+  | static
+  | media
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip = ["venv", ".venv", "migrations", "__pycache__"]
+
+[tool.mypy]
+python_version = "3.11"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+ignore_missing_imports = true
+strict_optional = true
+warn_unused_ignores = false
+warn_redundant_casts = true
+warn_unused_configs = true
+exclude = [
+    "venv/",
+    ".venv/",
+    "migrations/",
+]
+
+[tool.django-stubs]
+django_settings_module = "settings.env.local"

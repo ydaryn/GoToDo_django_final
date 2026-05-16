@@ -1,0 +1,3 @@
+#: apps/agile/views.py:25
+msgid "Task created successfully"
+msgstr "Тапсырма сәтті құралды"

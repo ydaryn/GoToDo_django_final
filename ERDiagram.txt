@@ -1,0 +1,148 @@
+// Task Manager - Entity Relationship Diagram
+// dbdiagram.io
+
+Table users {
+  id          integer   [pk, increment]
+  username    varchar   [not null, unique]
+  email       varchar   [not null, unique]
+  password    varchar   [not null]
+  first_name  varchar
+  last_name   varchar
+  avatar      varchar
+  is_active   boolean   [default: true]
+  date_joined timestamp [default: `now()`]
+  last_login  timestamp
+}
+
+Table projects {
+  id          integer   [pk, increment]
+  name        varchar   [not null]
+  description text
+  owner_id    integer   [ref: > users.id, not null]
+  status      varchar   [default: 'active', note: 'active | archived | completed']
+  created_at  timestamp [default: `now()`]
+  updated_at  timestamp
+}
+
+Table project_members {
+  id         integer  [pk, increment]
+  project_id integer  [ref: > projects.id, not null]
+  user_id    integer  [ref: > users.id, not null]
+  role       varchar  [default: 'member', note: 'owner | admin | member | viewer']
+  joined_at  timestamp [default: `now()`]
+
+  indexes {
+    (project_id, user_id) [unique]
+  }
+}
+
+Table epics {
+  id          integer   [pk, increment]
+  project_id  integer   [ref: > projects.id, not null]
+  title       varchar   [not null]
+  description text
+  owner_id    integer   [ref: > users.id]
+  status      varchar   [default: 'open', note: 'open | in_progress | closed']
+  start_date  date
+  end_date    date
+  created_at  timestamp [default: `now()`]
+  updated_at  timestamp
+}
+
+Table sprints {
+  id          integer   [pk, increment]
+  project_id  integer   [ref: > projects.id, not null]
+  name        varchar   [not null]
+  goal        text
+  status      varchar   [default: 'planned', note: 'planned | active | completed']
+  start_date  date
+  end_date    date
+  created_at  timestamp [default: `now()`]
+  updated_at  timestamp
+}
+
+Table tasks {
+  id           integer   [pk, increment]
+  project_id   integer   [ref: > projects.id, not null]
+  sprint_id    integer   [ref: > sprints.id]
+  epic_id      integer   [ref: > epics.id]
+  title        varchar   [not null]
+  description  text
+  assignee_id  integer   [ref: > users.id]
+  reporter_id  integer   [ref: > users.id, not null]
+  status       varchar   [default: 'todo', note: 'todo | in_progress | review | done']
+  priority     varchar   [default: 'medium', note: 'low | medium | high | critical']
+  story_points integer
+  due_date     date
+  created_at   timestamp [default: `now()`]
+  updated_at   timestamp
+}
+
+Table task_tags {
+  task_id integer [ref: > tasks.id, not null]
+  tag_id  integer [ref: > tags.id, not null]
+
+  indexes {
+    (task_id, tag_id) [unique]
+  }
+}
+
+Table subtasks {
+  id          integer   [pk, increment]
+  task_id     integer   [ref: > tasks.id, not null]
+  title       varchar   [not null]
+  description text
+  assignee_id integer   [ref: > users.id]
+  status      varchar   [default: 'todo', note: 'todo | in_progress | done']
+  due_date    date
+  order       integer   [default: 0]
+  created_at  timestamp [default: `now()`]
+  updated_at  timestamp
+}
+
+Table comments {
+  id         integer   [pk, increment]
+  task_id    integer   [ref: > tasks.id, not null]
+  author_id  integer   [ref: > users.id, not null]
+  body       text      [not null]
+  parent_id  integer   [ref: > comments.id, note: 'for threaded replies']
+  edited     boolean   [default: false]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+}
+
+Table tags {
+  id         integer   [pk, increment]
+  project_id integer   [ref: > projects.id, not null]
+  name       varchar   [not null]
+  color      varchar   [default: '#6366f1']
+  created_at timestamp [default: `now()`]
+
+  indexes {
+    (project_id, name) [unique]
+  }
+}
+
+Table notifications {
+  id          integer   [pk, increment]
+  recipient_id integer  [ref: > users.id, not null]
+  actor_id     integer  [ref: > users.id]
+  verb        varchar   [not null, note: 'assigned | commented | mentioned | status_changed']
+  entity_type varchar   [not null, note: 'task | subtask | comment | project']
+  entity_id   integer   [not null]
+  message     text
+  is_read     boolean   [default: false]
+  created_at  timestamp [default: `now()`]
+}
+
+Table activity_logs {
+  id          integer   [pk, increment]
+  actor_id    integer   [ref: > users.id, not null]
+  project_id  integer   [ref: > projects.id]
+  entity_type varchar   [not null, note: 'task | subtask | sprint | epic | comment']
+  entity_id   integer   [not null]
+  action      varchar   [not null, note: 'created | updated | deleted | status_changed']
+  old_value   jsonb
+  new_value   jsonb
+  created_at  timestamp [default: `now()`]
+}
