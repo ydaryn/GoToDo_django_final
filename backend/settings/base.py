@@ -27,7 +27,8 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     "parler",
     "adrf",
     "drf_spectacular",
-    "channels"
+    "channels",
+    "django_filters",
 ]
 
 PROJECT_APPS = [
@@ -72,6 +73,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.CursorPagination",
     "PAGE_SIZE": 100,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ),
 }
 
 
