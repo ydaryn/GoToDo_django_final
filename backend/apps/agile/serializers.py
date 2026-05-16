@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.agile.models import Epic, Sprint, Task, SubTask
+from apps.agile.models import Epic, Sprint, SubTask, Task
 from apps.projects.models import Tag
 
 
@@ -21,6 +21,7 @@ class TagSerializer(serializers.ModelSerializer):
 class EpicReadSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source="project.name", read_only=True)
     owner_email = serializers.EmailField(source="owner.email", read_only=True)
+    tasks_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Epic
@@ -35,6 +36,7 @@ class EpicReadSerializer(serializers.ModelSerializer):
             "status",
             "start_date",
             "end_date",
+            "tasks_count",
             "created_at",
             "updated_at",
         )
@@ -60,6 +62,7 @@ class EpicWriteSerializer(serializers.ModelSerializer):
 
 class SprintReadSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source="project.name", read_only=True)
+    tasks_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Sprint
@@ -72,6 +75,7 @@ class SprintReadSerializer(serializers.ModelSerializer):
             "status",
             "start_date",
             "end_date",
+            "tasks_count",
             "created_at",
             "updated_at",
         )
@@ -101,6 +105,7 @@ class TaskReadSerializer(serializers.ModelSerializer):
     assignee_email = serializers.EmailField(source="assignee.email", read_only=True)
     reporter_email = serializers.EmailField(source="reporter.email", read_only=True)
     tags = TagSerializer(many=True, read_only=True)
+    subtasks_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Task
@@ -122,6 +127,7 @@ class TaskReadSerializer(serializers.ModelSerializer):
             "priority",
             "story_points",
             "tags",
+            "subtasks_count",
             "due_date",
             "created_at",
             "updated_at",
