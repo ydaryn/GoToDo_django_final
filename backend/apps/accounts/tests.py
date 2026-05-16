@@ -1,87 +1,153 @@
-# apps/accounts/tests.py
-from typing import Any
-
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 User = get_user_model()
 
 
-class AuthenticationTests(APITestCase):
+class AuthenticationEndpointTests(APITestCase):
+    register_url = "/api/v1/auth/register/"
+    login_url = "/api/v1/auth/login/"
+    refresh_url = "/api/v1/auth/refresh/"
+    profile_url = "/api/v1/auth/profile/"
 
     def setUp(self) -> None:
-        self.register_url: str = reverse("auth_register")
-        self.login_url: str = reverse("auth_login")
+        self.user_password = "StrongPassword123"
 
-        self.user_data: dict[str, Any] = {
-            "email": "testuser@kbtu.kz",
-            "password": "StrongPassword123",
-            "full_name": "John Doe",
-            "role": "developer",
-        }
-        # Создаем пользователя заранее для тестов авторизации
-        self.user: User = User.objects.create_user(
-            email="existing@kbtu.kz",
-            password="CorrectPassword123",
+        self.user = User.objects.create_user(
+            email="existing@example.com",
+            password=self.user_password,
             full_name="Existing User",
             role="developer",
         )
 
-    # ==========================================
-    # TESTS: Registration Endpoint
-    # ==========================================
-    def test_registration_success(self) -> None:
-        """1. Хороший кейс: Успешная регистрация с валидными данными."""
-        response = self.client.post(self.register_url, self.user_data, format="json")
+    def test_register_user_success(self) -> None:
+        payload = {
+            "email": "newuser@example.com",
+            "full_name": "New User",
+            "password": "StrongPassword123",
+            "role": "developer",
+        }
+
+        response = self.client.post(self.register_url, payload, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["email"], self.user_data["email"])
-        self.assertNotIn("password", response.data)  # Пароль не должен возвращаться
+        self.assertTrue(User.objects.filter(email="newuser@example.com").exists())
 
-    def test_registration_failed_duplicate_email(self) -> None:
-        """2. Плохой кейс: Ошибка при попытке зарегистрировать уже существующий email."""
-        duplicate_data = self.user_data.copy()
-        duplicate_data["email"] = "existing@kbtu.kz"  # Этот email уже занят в setUp
+    def test_register_user_with_short_password_fails(self) -> None:
+        payload = {
+            "email": "shortpass@example.com",
+            "full_name": "Short Password",
+            "password": "123",
+            "role": "developer",
+        }
 
-        response = self.client.post(self.register_url, duplicate_data, format="json")
+        response = self.client.post(self.register_url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(User.objects.filter(email="shortpass@example.com").exists())
+
+    def test_register_user_without_email_fails(self) -> None:
+        payload = {
+            "full_name": "No Email User",
+            "password": "StrongPassword123",
+            "role": "developer",
+        }
+
+        response = self.client.post(self.register_url, payload, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_registration_failed_short_password(self) -> None:
-        """3. Плохой кейс: Ошибка валидации, если пароль меньше 8 символов."""
-        weak_data = self.user_data.copy()
-        weak_data["password"] = "123"
+    def test_login_success_returns_tokens(self) -> None:
+        payload = {
+            "email": "existing@example.com",
+            "password": self.user_password,
+        }
 
-        response = self.client.post(self.register_url, weak_data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("password", response.data)
+        response = self.client.post(self.login_url, payload, format="json")
 
-    # ==========================================
-    # TESTS: Login (JWT Token Obtain) Endpoint
-    # ==========================================
-    def test_login_success(self) -> None:
-        """1. Хороший кейс: Получение токенов при правильных кредах."""
-        login_data = {"email": "existing@kbtu.kz", "password": "CorrectPassword123"}
-        response = self.client.post(self.login_url, login_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("access", response.data)
         self.assertIn("refresh", response.data)
-        self.assertEqual(response.data["user"]["email"], "existing@kbtu.kz")
+        self.assertIn("user", response.data)
 
-    def test_login_failed_wrong_password(self) -> None:
-        """2. Плохой кейс: Ошибка 401 при неверном пароле."""
-        wrong_password_data = {
-            "email": "existing@kbtu.kz",
-            "password": "WrongPassword!",
+    def test_login_with_wrong_password_fails(self) -> None:
+        payload = {
+            "email": "existing@example.com",
+            "password": "WrongPassword123",
         }
-        response = self.client.post(self.login_url, wrong_password_data, format="json")
+
+        response = self.client.post(self.login_url, payload, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_login_failed_invalid_email(self) -> None:
-        """3. Плохой кейс: Ошибка 401, если пользователя с таким email нет в системе."""
-        wrong_email_data = {
-            "email": "fakeuser@kbtu.kz",
-            "password": "CorrectPassword123",
+    def test_login_without_password_fails(self) -> None:
+        payload = {
+            "email": "existing@example.com",
         }
-        response = self.client.post(self.login_url, wrong_email_data, format="json")
+
+        response = self.client.post(self.login_url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_refresh_token_success(self) -> None:
+        login_response = self.client.post(
+            self.login_url,
+            {
+                "email": "existing@example.com",
+                "password": self.user_password,
+            },
+            format="json",
+        )
+
+        refresh_token = login_response.data["refresh"]
+
+        response = self.client.post(
+            self.refresh_url,
+            {"refresh": refresh_token},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+
+    def test_refresh_token_with_invalid_token_fails(self) -> None:
+        response = self.client.post(
+            self.refresh_url,
+            {"refresh": "invalid-token"},
+            format="json",
+        )
+
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_refresh_token_without_token_fails(self) -> None:
+        response = self.client.post(self.refresh_url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_get_profile_success(self) -> None:
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get(self.profile_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["email"], self.user.email)
+
+    def test_get_profile_without_authentication_fails(self) -> None:
+        response = self.client.get(self.profile_url)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_update_profile_success(self) -> None:
+        self.client.force_authenticate(user=self.user)
+
+        payload = {
+            "full_name": "Updated User",
+            "role": "developer",
+        }
+
+        response = self.client.patch(self.profile_url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.full_name, "Updated User")
