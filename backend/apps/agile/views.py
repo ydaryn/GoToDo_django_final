@@ -59,7 +59,11 @@ from apps.agile.serializers import (
 )
 class EpicViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_fields = ["project", "owner", "status"]
     search_fields = ["title", "description", "project__name", "owner__email"]
     ordering_fields = ["created_at", "updated_at", "start_date", "end_date", "status"]
@@ -123,7 +127,11 @@ class EpicViewSet(viewsets.ModelViewSet):
 )
 class SprintViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_fields = ["project", "status"]
     search_fields = ["name", "goal", "project__name"]
     ordering_fields = ["created_at", "updated_at", "start_date", "end_date", "status"]
@@ -190,7 +198,11 @@ class SprintViewSet(viewsets.ModelViewSet):
 )
 class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_fields = [
         "project",
         "sprint",
@@ -286,21 +298,22 @@ class TaskViewSet(viewsets.ModelViewSet):
 )
 class SubTaskViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_fields = ["task", "assignee", "status", "due_date"]
     search_fields = ["title", "description", "task__title", "assignee__email"]
     ordering_fields = ["created_at", "updated_at", "due_date", "order", "status"]
     ordering = ["order", "created_at"]
 
     def get_queryset(self) -> QuerySet[SubTask]:
-        return (
-            SubTask.objects.select_related(
-                "task",
-                "task__project",
-                "assignee",
-            )
-            .order_by("order", "created_at")
-        )
+        return SubTask.objects.select_related(
+            "task",
+            "task__project",
+            "assignee",
+        ).order_by("order", "created_at")
 
     def get_serializer_class(self) -> Any:
         if self.action in ["list", "retrieve"]:

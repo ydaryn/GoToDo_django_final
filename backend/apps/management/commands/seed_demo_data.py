@@ -6,23 +6,20 @@ from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
-
 from faker import Faker
-
 from your_app.models import (
-    User,
+    ActivityLog,
+    Comment,
+    Epic,
+    Notification,
     Project,
     ProjectMember,
     Sprint,
-    Epic,
-    Task,
     SubTask,
-    Comment,
     Tag,
-    Notification,
-    ActivityLog,
+    Task,
+    User,
 )
-
 
 fake = Faker()
 
@@ -80,9 +77,7 @@ class Command(BaseCommand):
             self.create_notifications(users, tasks, comments)
             self.create_activity_logs(project, users, tasks)
 
-        self.stdout.write(
-            self.style.SUCCESS("Demo database successfully created.")
-        )
+        self.stdout.write(self.style.SUCCESS("Demo database successfully created."))
 
     # ------------------------------------------------------------------
     # USERS
@@ -263,9 +258,7 @@ class Command(BaseCommand):
             reporter = random.choice(users)
             assignee = random.choice(users)
 
-            due_date = timezone.now().date() + timedelta(
-                days=random.randint(1, 60)
-            )
+            due_date = timezone.now().date() + timedelta(days=random.randint(1, 60))
 
             task = Task.objects.create(
                 project=project,
@@ -287,9 +280,7 @@ class Command(BaseCommand):
             tasks.append(task)
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"Created {len(tasks)} tasks for {project.name}"
-            )
+            self.style.SUCCESS(f"Created {len(tasks)} tasks for {project.name}")
         )
 
         return tasks
@@ -389,9 +380,7 @@ class Command(BaseCommand):
             notifications.append(notification)
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"Created {len(notifications)} notifications"
-            )
+            self.style.SUCCESS(f"Created {len(notifications)} notifications")
         )
 
     # ------------------------------------------------------------------
@@ -424,8 +413,4 @@ class Command(BaseCommand):
 
             logs.append(log)
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Created {len(logs)} activity logs"
-            )
-        )
+        self.stdout.write(self.style.SUCCESS(f"Created {len(logs)} activity logs"))

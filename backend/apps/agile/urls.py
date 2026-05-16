@@ -1,14 +1,15 @@
 # apps/agile/urls.py
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import EpicViewSet, SprintViewSet, TaskViewSet, SubTaskViewSet
+
+from .views import EpicViewSet, SprintViewSet, SubTaskViewSet, TaskViewSet
 
 router: DefaultRouter = DefaultRouter()
-router.register(r'epics', EpicViewSet, basename='epic')
-router.register(r'sprints', SprintViewSet, basename='sprint')
-router.register(r'tasks', TaskViewSet, basename='task')
-router.register(r'subtasks', SubTaskViewSet, basename='subtask')
+router.register(r"epics", EpicViewSet, basename="epic")
+router.register(r"sprints", SprintViewSet, basename="sprint")
+router.register(r"tasks", TaskViewSet, basename="task")
+router.register(r"subtasks", SubTaskViewSet, basename="subtask")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

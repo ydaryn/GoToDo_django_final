@@ -1,18 +1,19 @@
 import os
 from datetime import timedelta
+
 from settings.conf import *  # noqa: F403
 
 # ==========================================
 # Paths
 # ==========================================
-BASE_DIR  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOGS_DIR  = os.path.join(BASE_DIR, "logs")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOGS_DIR = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOGS_DIR, exist_ok=True)
 
-ROOT_URLCONF       = "settings.urls"
-WSGI_APPLICATION   = "settings.wsgi.application"
-ASGI_APPLICATION   = "settings.asgi.application"
-AUTH_USER_MODEL    = "accounts.User"
+ROOT_URLCONF = "settings.urls"
+WSGI_APPLICATION = "settings.wsgi.application"
+ASGI_APPLICATION = "settings.asgi.application"
+AUTH_USER_MODEL = "accounts.User"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DJANGO_AND_THIRD_PARTY_APPS = [
@@ -33,8 +34,8 @@ DJANGO_AND_THIRD_PARTY_APPS = [
 
 PROJECT_APPS = [
     "apps.accounts",
-    "apps.projects",  
-    "apps.agile",    
+    "apps.projects",
+    "apps.agile",
 ]
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
@@ -62,7 +63,6 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_id",
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
-
 
 
 REST_FRAMEWORK = {
@@ -114,11 +114,11 @@ AUTH_PASSWORD_VALIDATORS = [
 """
 Languages
 """
-SUPPORTED_LANGUAGES = ["en","ru","kk"]
+SUPPORTED_LANGUAGES = ["en", "ru", "kk"]
 LANGUAGES = [
-    ("en","English"),
-    ("ru","Русский"),
-    ("kk","Қазақша"),
+    ("en", "English"),
+    ("ru", "Русский"),
+    ("kk", "Қазақша"),
 ]
 
 """
@@ -140,9 +140,8 @@ PARLER_LANGUAGES = {
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
-
 LANGUAGE_CODE = "en"
-LOCALE_PATHS = [os.path.join(BASE_DIR,"locale")]
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_L10N = True

@@ -18,6 +18,7 @@ class TagSerializer(serializers.ModelSerializer):
 # Epic serializers
 # ---------------------------------------------------------------------------
 
+
 class EpicReadSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source="project.name", read_only=True)
     owner_email = serializers.EmailField(source="owner.email", read_only=True)
@@ -60,6 +61,7 @@ class EpicWriteSerializer(serializers.ModelSerializer):
 # Sprint serializers
 # ---------------------------------------------------------------------------
 
+
 class SprintReadSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source="project.name", read_only=True)
     tasks_count = serializers.IntegerField(read_only=True)
@@ -97,6 +99,7 @@ class SprintWriteSerializer(serializers.ModelSerializer):
 # ---------------------------------------------------------------------------
 # Task serializers
 # ---------------------------------------------------------------------------
+
 
 class TaskReadSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source="project.name", read_only=True)
@@ -156,6 +159,7 @@ class TaskWriteSerializer(serializers.ModelSerializer):
 # ---------------------------------------------------------------------------
 # SubTask serializers
 # ---------------------------------------------------------------------------
+
 
 class SubTaskReadSerializer(serializers.ModelSerializer):
     task_title = serializers.CharField(source="task.title", read_only=True)
