@@ -195,3 +195,25 @@ SPECTACULAR_SETTINGS = {
         }
     },
 }
+
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", REDIS_URL)
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", REDIS_URL)
+
+CELERY_BEAT_SCHEDULE = {
+    "check-overdue-tasks-every-minute": {
+        "task" : "apps.agile.tasks.check_overdue_tasks",
+        "schedule": 60.0,  # every minute
+    },
+}

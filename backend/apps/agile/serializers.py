@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.agile.models import Epic, Sprint, SubTask, Task
 from apps.projects.models import Tag
-
+from apps.agile.tasks import send_task_created_notification
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -195,3 +195,8 @@ class SubTaskWriteSerializer(serializers.ModelSerializer):
             "due_date",
             "order",
         )
+
+def create(self, validated_data):
+    task = Task.objects.create(**validated_data)
+    send_task_created_notification.delay(task.id)
+    return task
