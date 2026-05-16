@@ -32,6 +32,8 @@ DJANGO_AND_THIRD_PARTY_APPS = [
 
 PROJECT_APPS = [
     "apps.accounts",
+    "apps.projects",  
+    "apps.agile",    
 ]
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
@@ -129,10 +131,6 @@ PARLER_LANGUAGES = {
 }
 
 
-
-
-
-
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
@@ -157,3 +155,25 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
+
+# API Documentation (Swagger / Spectacular)
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'GoToDo API',
+    'DESCRIPTION': 'Документация бэкенда для таск-менеджера GoToDo (KBTU Final Project)',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    # Настройка, чтобы прямо в Swagger можно было нажать кнопку Authorize и вставить JWT-токен
+    'SECURITY': [{'BearerAuth': []}],
+    'APPEND_COMPONENTS': {
+        'securitySchemes': {
+            'BearerAuth': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'Authorization',
+                'description': 'Введите токен в формате: Bearer <ваш_access_token>'
+            }
+        }
+    }
+}
